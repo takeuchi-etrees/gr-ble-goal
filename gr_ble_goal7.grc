@@ -93,43 +93,24 @@ blocks:
     coordinate: [296, 100.0]
     rotation: 0
     state: enabled
-- name: blocks_file_sink_0
-  id: blocks_file_sink
-  parameters:
-    affinity: ''
-    alias: ''
-    append: 'False'
-    comment: ''
-    file: /tmp/fifo
-    type: short
-    unbuffered: 'False'
-    vlen: '1'
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [1584, 668.0]
-    rotation: 0
-    state: disabled
-- name: blocks_float_to_short_0
-  id: blocks_float_to_short
+- name: blocks_complex_to_float_0
+  id: blocks_complex_to_float
   parameters:
     affinity: ''
     alias: ''
     comment: ''
     maxoutbuf: '0'
     minoutbuf: '0'
-    scale: '1'
     vlen: '1'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1432, 668.0]
+    coordinate: [1080, 312.0]
     rotation: 0
-    state: disabled
-- name: blocks_uchar_to_float_0
-  id: blocks_uchar_to_float
+    state: enabled
+- name: blocks_correctiq_0
+  id: blocks_correctiq
   parameters:
     affinity: ''
     alias: ''
@@ -140,9 +121,63 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1232, 496.0]
+    coordinate: [344, 384.0]
     rotation: 0
-    state: disabled
+    state: enabled
+- name: blocks_correctiq_0_0
+  id: blocks_correctiq
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [352, 552.0]
+    rotation: 0
+    state: enabled
+- name: blocks_moving_average_xx_0
+  id: blocks_moving_average_xx
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    length: '20'
+    max_iter: '4000'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    scale: '0.05'
+    type: float
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1200, 484.0]
+    rotation: 0
+    state: enabled
+- name: blocks_tag_gate_0
+  id: blocks_tag_gate
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    propagate_tags: 'False'
+    single_key: '"ble_sync"'
+    type: byte
+    vlen: '1'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1488, 148.0]
+    rotation: 0
+    state: enabled
 - name: blocks_uchar_to_float_1
   id: blocks_uchar_to_float
   parameters:
@@ -155,7 +190,7 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1608, 400.0]
+    coordinate: [1664, 160.0]
     rotation: 0
     state: enabled
 - name: digital_correlate_access_code_tag_xx_0
@@ -174,33 +209,10 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1240, 324.0]
+    coordinate: [1008, 140.0]
     rotation: 0
     state: enabled
-- name: digital_gfsk_demod_0
-  id: digital_gfsk_demod
-  parameters:
-    affinity: ''
-    alias: ''
-    comment: ''
-    freq_error: '0.0'
-    gain_mu: '0.175'
-    log: 'False'
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    mu: '0.5'
-    omega_relative_limit: '0.005'
-    samples_per_symbol: '2'
-    sensitivity: '1.0'
-    verbose: 'False'
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [1000, 452.0]
-    rotation: 0
-    state: disabled
-- name: digital_gfsk_demod_0_0
+- name: digital_gfsk_demod_0_0_0
   id: digital_gfsk_demod
   parameters:
     affinity: ''
@@ -220,11 +232,73 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1000, 308.0]
+    coordinate: [784, 116.0]
     rotation: 0
     state: enabled
-- name: etreesModule_bleDecode_0
-  id: etreesModule_bleDecode
+- name: epy_block_0
+  id: epy_block
+  parameters:
+    _source_code: "\"\"\"\nEmbedded Python Blocks:\n\nEach time this file is saved,\
+      \ GRC will instantiate the first class it finds\nto get ports and parameters\
+      \ of your block. The arguments to __init__  will\nbe the parameters. All of\
+      \ them are required to have default values!\n\"\"\"\n\nimport numpy as np\n\
+      from gnuradio import gr\nimport pmt\nimport time\n\n\nclass RangeDetector(gr.sync_block):\
+      \  # other base classes are basic_block, decim_block, interp_block\n    \"\"\
+      \"Embedded Python Block example - a simple multiply const\"\"\"\n\n    def __init__(self,\
+      \ range=0.1):  # only default arguments here\n        \"\"\"arguments to this\
+      \ function show up as parameters in GRC\"\"\"\n        gr.sync_block.__init__(\n\
+      \            self,\n            name='Embedded Python Block',   # will show\
+      \ up in GRC\n            in_sig=[np.float32],\n            out_sig=[np.float32]\n\
+      \        )\n        # if an attribute with the same name as a parameter is found,\n\
+      \        # a callback is registered (properties work, too).\n        self.range\
+      \ = range\n        self.cur_val = 0.0\n        self.in_range = False\n     \
+      \   self.count = 0\n\n    def work(self, input_items, output_items):\n     \
+      \   for i in range(len(input_items[0])):\n            if input_items[0][i] <\
+      \ self.cur_val - self.range:\n                self.cur_val = input_items[0][i]\n\
+      \                self.count = 0\n            elif input_items[0][i] > self.cur_val\
+      \ + self.range:\n                self.cur_val = input_items[0][i]\n        \
+      \        self.count = 0\n            else:\n                self.cur_val = input_items[0][i]\n\
+      \                self.count += 1\n            \n            if self.count >\
+      \ 100:\n                output_items[0][i] = 1.0\n            else:\n      \
+      \          output_items[0][i] = 0.0\n                \n            if self.count\
+      \ == 100:\n                tag_key = pmt.intern(\"in_range\")\n            \
+      \    tag_value = pmt.from_long(int(time.time()))\n                tag_offset\
+      \ = i\n                self.add_item_tag(0, self.nitems_written(0) + tag_offset,\
+      \ tag_key, tag_value)\n                           \n        return len(output_items[0])\n"
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    range: '0.1'
+  states:
+    _io_cache: ('Embedded Python Block', 'RangeDetector', [('range', '0.1')], [('0',
+      'float', 1)], [('0', 'float', 1)], 'Embedded Python Block example - a simple
+      multiply const', ['range'])
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1520, 568.0]
+    rotation: 0
+    state: enabled
+- name: etreesModule_bleDecoder_0_0
+  id: etreesModule_bleDecoder
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    uuid: '"d1f1e152-7032-11e6-8b77-86f30ca893d3"'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1248, 156.0]
+    rotation: 0
+    state: enabled
+- name: etreesModule_calcPhaseDiff_0
+  id: etreesModule_calcPhaseDiff
   parameters:
     affinity: ''
     alias: ''
@@ -235,7 +309,22 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1464, 416.0]
+    coordinate: [880, 432.0]
+    rotation: 0
+    state: enabled
+- name: etreesModule_moveTag_0
+  id: etreesModule_moveTag
+  parameters:
+    affinity: ''
+    alias: ''
+    comment: ''
+    maxoutbuf: '0'
+    minoutbuf: '0'
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [1872, 160.0]
     rotation: 0
     state: enabled
 - name: iio_fmcomms2_source_0
@@ -253,7 +342,7 @@ blocks:
     frequency: int(freq)
     fstop: '0'
     gain1: '''fast_attack'''
-    gain2: '''slow_attack'''
+    gain2: '''fast_attack'''
     len_tag_key: packet_len
     manual_gain1: '64'
     manual_gain2: '64'
@@ -263,7 +352,7 @@ blocks:
     rf_port_select: '''A_BALANCED'''
     rfdc: 'True'
     rx1_en: 'True'
-    rx2_en: 'False'
+    rx2_en: 'True'
     samplerate: int(samp_rate)
     type: fc32
     uri: ip:192.168.3.10
@@ -271,23 +360,58 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [48, 324.0]
+    coordinate: [88, 364.0]
     rotation: 0
     state: enabled
-- name: keyfob_parse_packet_0
-  id: keyfob_parse_packet
+- name: low_pass_filter_0
+  id: low_pass_filter
   parameters:
     affinity: ''
     alias: ''
+    beta: '6.76'
     comment: ''
+    cutoff_freq: 1e6
+    decim: '8'
+    gain: '1'
+    interp: '1'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samp_rate: samp_rate
+    type: fir_filter_ccf
+    width: 5e5
+    win: window.WIN_HAMMING
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1560, 344.0]
+    coordinate: [584, 324.0]
     rotation: 0
-    state: disabled
-- name: low_pass_filter_0
+    state: enabled
+- name: low_pass_filter_0_0
+  id: low_pass_filter
+  parameters:
+    affinity: ''
+    alias: ''
+    beta: '6.76'
+    comment: ''
+    cutoff_freq: 1e6
+    decim: '8'
+    gain: '1'
+    interp: '1'
+    maxoutbuf: '0'
+    minoutbuf: '0'
+    samp_rate: samp_rate
+    type: fir_filter_ccf
+    width: 5e5
+    win: window.WIN_HAMMING
+  states:
+    bus_sink: false
+    bus_source: false
+    bus_structure: null
+    coordinate: [584, 492.0]
+    rotation: 0
+    state: enabled
+- name: low_pass_filter_0_2
   id: low_pass_filter
   parameters:
     affinity: ''
@@ -308,90 +432,9 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [720, 372.0]
+    coordinate: [576, 108.0]
     rotation: 0
     state: enabled
-- name: qtgui_freq_sink_x_0
-  id: qtgui_freq_sink_x
-  parameters:
-    affinity: ''
-    alias: ''
-    alpha1: '1.0'
-    alpha10: '1.0'
-    alpha2: '1.0'
-    alpha3: '1.0'
-    alpha4: '1.0'
-    alpha5: '1.0'
-    alpha6: '1.0'
-    alpha7: '1.0'
-    alpha8: '1.0'
-    alpha9: '1.0'
-    autoscale: 'False'
-    average: '0.2'
-    axislabels: 'True'
-    bw: samp_rate
-    color1: '"blue"'
-    color10: '"dark blue"'
-    color2: '"red"'
-    color3: '"green"'
-    color4: '"black"'
-    color5: '"cyan"'
-    color6: '"magenta"'
-    color7: '"yellow"'
-    color8: '"dark red"'
-    color9: '"dark green"'
-    comment: ''
-    ctrlpanel: 'False'
-    fc: '0'
-    fftsize: '1024'
-    freqhalf: 'True'
-    grid: 'False'
-    gui_hint: ''
-    label: Relative Gain
-    label1: ''
-    label10: ''''''
-    label2: ''''''
-    label3: ''''''
-    label4: ''''''
-    label5: ''''''
-    label6: ''''''
-    label7: ''''''
-    label8: ''''''
-    label9: ''''''
-    legend: 'True'
-    maxoutbuf: '0'
-    minoutbuf: '0'
-    name: '""'
-    nconnections: '1'
-    norm_window: 'False'
-    showports: 'False'
-    tr_chan: '0'
-    tr_level: '0.0'
-    tr_mode: qtgui.TRIG_MODE_FREE
-    tr_tag: '""'
-    type: complex
-    units: dB
-    update_time: '0.10'
-    width1: '1'
-    width10: '1'
-    width2: '1'
-    width3: '1'
-    width4: '1'
-    width5: '1'
-    width6: '1'
-    width7: '1'
-    width8: '1'
-    width9: '1'
-    wintype: window.WIN_BLACKMAN_hARRIS
-    ymax: '10'
-    ymin: '-140'
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [1008, 92.0]
-    rotation: 0
-    state: disabled
 - name: qtgui_time_sink_x_0
   id: qtgui_time_sink_x
   parameters:
@@ -466,7 +509,7 @@ blocks:
     tr_mode: qtgui.TRIG_MODE_FREE
     tr_slope: qtgui.TRIG_SLOPE_POS
     tr_tag: '""'
-    type: complex
+    type: float
     update_time: '0.10'
     width1: '1'
     width10: '1'
@@ -486,10 +529,10 @@ blocks:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1008, 188.0]
+    coordinate: [1848, 728.0]
     rotation: 0
-    state: disabled
-- name: qtgui_time_sink_x_0_0
+    state: enabled
+- name: qtgui_time_sink_x_0_1_0_0
   id: qtgui_time_sink_x
   parameters:
     affinity: ''
@@ -543,9 +586,9 @@ blocks:
     marker8: '-1'
     marker9: '-1'
     name: '""'
-    nconnections: '1'
-    size: '1024'
-    srate: samp_rate
+    nconnections: '4'
+    size: '3000'
+    srate: samp_rate / 8
     stemplot: 'False'
     style1: '1'
     style10: '1'
@@ -559,8 +602,8 @@ blocks:
     style9: '1'
     tr_chan: '0'
     tr_delay: '0'
-    tr_level: '0.0'
-    tr_mode: qtgui.TRIG_MODE_FREE
+    tr_level: '0.2'
+    tr_mode: qtgui.TRIG_MODE_NORM
     tr_slope: qtgui.TRIG_SLOPE_POS
     tr_tag: '""'
     type: float
@@ -576,129 +619,40 @@ blocks:
     width8: '1'
     width9: '1'
     ylabel: Amplitude
-    ymax: '1'
-    ymin: '-1'
+    ymax: '7'
+    ymin: '-7'
     yunit: '""'
   states:
     bus_sink: false
     bus_source: false
     bus_structure: null
-    coordinate: [1568, 492.0]
-    rotation: 0
-    state: disabled
-- name: qtgui_time_sink_x_1
-  id: qtgui_time_sink_x
-  parameters:
-    affinity: ''
-    alias: ''
-    alpha1: '1.0'
-    alpha10: '1.0'
-    alpha2: '1.0'
-    alpha3: '1.0'
-    alpha4: '1.0'
-    alpha5: '1.0'
-    alpha6: '1.0'
-    alpha7: '1.0'
-    alpha8: '1.0'
-    alpha9: '1.0'
-    autoscale: 'False'
-    axislabels: 'True'
-    color1: blue
-    color10: dark blue
-    color2: red
-    color3: green
-    color4: black
-    color5: cyan
-    color6: magenta
-    color7: yellow
-    color8: dark red
-    color9: dark green
-    comment: ''
-    ctrlpanel: 'False'
-    entags: 'True'
-    grid: 'False'
-    gui_hint: ''
-    label1: Signal 1
-    label10: Signal 10
-    label2: Signal 2
-    label3: Signal 3
-    label4: Signal 4
-    label5: Signal 5
-    label6: Signal 6
-    label7: Signal 7
-    label8: Signal 8
-    label9: Signal 9
-    legend: 'True'
-    marker1: '-1'
-    marker10: '-1'
-    marker2: '-1'
-    marker3: '-1'
-    marker4: '-1'
-    marker5: '-1'
-    marker6: '-1'
-    marker7: '-1'
-    marker8: '-1'
-    marker9: '-1'
-    name: '""'
-    nconnections: '1'
-    size: '1024'
-    srate: samp_rate
-    stemplot: 'False'
-    style1: '1'
-    style10: '1'
-    style2: '1'
-    style3: '1'
-    style4: '1'
-    style5: '1'
-    style6: '1'
-    style7: '1'
-    style8: '1'
-    style9: '1'
-    tr_chan: '0'
-    tr_delay: '0'
-    tr_level: '0.0'
-    tr_mode: qtgui.TRIG_MODE_TAG
-    tr_slope: qtgui.TRIG_SLOPE_POS
-    tr_tag: '"MAC"'
-    type: float
-    update_time: '0.10'
-    width1: '1'
-    width10: '1'
-    width2: '1'
-    width3: '1'
-    width4: '1'
-    width5: '1'
-    width6: '1'
-    width7: '1'
-    width8: '1'
-    width9: '1'
-    ylabel: Amplitude
-    ymax: '1'
-    ymin: '-1'
-    yunit: '""'
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [1768, 380.0]
+    coordinate: [2040, 304.0]
     rotation: 0
     state: enabled
 
 connections:
-- [blocks_float_to_short_0, '0', blocks_file_sink_0, '0']
-- [blocks_uchar_to_float_0, '0', blocks_float_to_short_0, '0']
-- [blocks_uchar_to_float_0, '0', qtgui_time_sink_x_0_0, '0']
-- [blocks_uchar_to_float_1, '0', qtgui_time_sink_x_1, '0']
-- [digital_correlate_access_code_tag_xx_0, '0', etreesModule_bleDecode_0, '0']
-- [digital_correlate_access_code_tag_xx_0, '0', keyfob_parse_packet_0, '0']
-- [digital_gfsk_demod_0, '0', blocks_uchar_to_float_0, '0']
-- [digital_gfsk_demod_0_0, '0', digital_correlate_access_code_tag_xx_0, '0']
-- [etreesModule_bleDecode_0, '0', blocks_uchar_to_float_1, '0']
-- [iio_fmcomms2_source_0, '0', low_pass_filter_0, '0']
-- [low_pass_filter_0, '0', digital_gfsk_demod_0, '0']
-- [low_pass_filter_0, '0', digital_gfsk_demod_0_0, '0']
-- [low_pass_filter_0, '0', qtgui_freq_sink_x_0, '0']
-- [low_pass_filter_0, '0', qtgui_time_sink_x_0, '0']
+- [blocks_complex_to_float_0, '0', qtgui_time_sink_x_0_1_0_0, '0']
+- [blocks_correctiq_0, '0', low_pass_filter_0, '0']
+- [blocks_correctiq_0, '0', low_pass_filter_0_2, '0']
+- [blocks_correctiq_0_0, '0', low_pass_filter_0_0, '0']
+- [blocks_moving_average_xx_0, '0', epy_block_0, '0']
+- [blocks_moving_average_xx_0, '0', qtgui_time_sink_x_0_1_0_0, '2']
+- [blocks_tag_gate_0, '0', blocks_uchar_to_float_1, '0']
+- [blocks_uchar_to_float_1, '0', etreesModule_moveTag_0, '0']
+- [digital_correlate_access_code_tag_xx_0, '0', etreesModule_bleDecoder_0_0, '0']
+- [digital_gfsk_demod_0_0_0, '0', digital_correlate_access_code_tag_xx_0, '0']
+- [epy_block_0, '0', qtgui_time_sink_x_0, '0']
+- [epy_block_0, '0', qtgui_time_sink_x_0_1_0_0, '3']
+- [etreesModule_bleDecoder_0_0, '0', blocks_tag_gate_0, '0']
+- [etreesModule_calcPhaseDiff_0, '0', blocks_moving_average_xx_0, '0']
+- [etreesModule_calcPhaseDiff_0, '0', etreesModule_moveTag_0, '1']
+- [etreesModule_moveTag_0, '0', qtgui_time_sink_x_0_1_0_0, '1']
+- [iio_fmcomms2_source_0, '0', blocks_correctiq_0, '0']
+- [iio_fmcomms2_source_0, '1', blocks_correctiq_0_0, '0']
+- [low_pass_filter_0, '0', blocks_complex_to_float_0, '0']
+- [low_pass_filter_0, '0', etreesModule_calcPhaseDiff_0, '0']
+- [low_pass_filter_0_0, '0', etreesModule_calcPhaseDiff_0, '1']
+- [low_pass_filter_0_2, '0', digital_gfsk_demod_0_0_0, '0']
 
 metadata:
   file_format: 1
