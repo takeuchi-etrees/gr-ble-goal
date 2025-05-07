@@ -28,10 +28,14 @@ while True:
                 v = metadata["MAC"]
                 v = v.split("@")
                 cur_mac_seq = int(v[2])
+                v[2] = cur_mac_seq
+
+                 #if True:
                 if cur_mac_seq > prev_mac_seq:
                     prev_mac_seq = cur_mac_seq
 
                     cur_time = int(v[1])
+                    v[1] = cur_time
                     print("MAC", v)
                     print(cur_time - prev_time)
 #                    print((cur_time - prev_time) % 1000)
@@ -41,10 +45,12 @@ while True:
                 v = metadata["in_range"]
                 v = v.split("@")
                 cur_in_range_seq = int(v[2])
+                v[2] = cur_in_range_seq
                 if cur_in_range_seq > prev_in_range_seq:
                     prev_in_range_seq = cur_in_range_seq
 
                     cur_time = int(v[1])
+                    v[1] = cur_time
                     print("in_range", v)
-#                    print(cur_time - prev_time)
+                    print(cur_time - prev_time)
                     prev_time = cur_time
