@@ -2,6 +2,7 @@ import zmq
 import pmt
 import curses
 import sys
+import datetime
 import json
 
 context = zmq.Context()
@@ -11,7 +12,11 @@ socket.connect("tcp://127.0.0.1:3334")
 socket.setsockopt_string(zmq.SUBSCRIBE, "")
 
 def main(stdscr):
-
+    delta = datetime.timedelta(hours=9)
+    jst = datetime.timezone(delta, 'JST')
+    now = datetime.datetime.now(jst)
+    data_name = now.strftime('%Y_%m%d_%H%M%S')
+    
     prev_time = 0
     prev_mac_seq = 0
     prev_in_range_seq = 0
@@ -39,8 +44,8 @@ def main(stdscr):
     
     while True:
         c = stdscr.getch()
-        if c == ord('s'):
-            with open('data.json', 'w') as file:
+        if c == ord('w'):
+            with open(data_name + '.json', 'w') as file:
                 json.dump(data, file, indent=2)
         elif c == ord('q'):
             sys.exit()
@@ -78,7 +83,6 @@ def main(stdscr):
 
                         data = sorted(data, key=lambda x: (x[0], -ord(x[1][0])))
 
-                        # curses.beep()
                         print_data(stdscr, data)
                         
                         prev_time = cur_time
@@ -118,20 +122,24 @@ def print_data(stdscr, data):
                 if data[i - 1][1] == 'MAC':
                     data[i].append('None')
                 else:
-                    data[i].append(data[i][0] - data[i - 1][0])
+                    if (data[i - 1][1] == 'in_range') and (data[i][0] - data[i - 1][0] <= 0.002):
+                        data[i].append(data[i - 1][2])
+                    else:
+                        data[i].append('None')
             elif data[i][1] == 'MAC':
                 if data[i - 1][1] == 'MAC':
                     data[i][3] = 'None'
                 else:
-                    data[i][3] = data[i][0] - data[i - 1][0]
+                    if (data[i - 1][1] == 'in_range') and (data[i][0] - data[i - 1][0] <= 0.002):
+                        data[i][3] = data[i - 1][2]
                 
 
-            if data[i][1] == 'MAC':
-                if data[i][2][0] == 'E':
+            if (data[i][1] == 'MAC') and (len(data[i][2]) == 17):
+                if data[i][2] == 'E2:FE:71:37:E2:EE':
                     stdscr.addstr(y, 0, str(data[i]), curses.color_pair(9))
-                elif data[i][2][0:2] == 'C8':
+                elif data[i][2] == 'C8:9D:1B:27:58:7E':
                     stdscr.addstr(y, 0, str(data[i]), curses.color_pair(13))
-                elif data[i][2][0:2] == 'CD':
+                elif data[i][2] == 'CD:C5:0E:2E:C9:58':
                     stdscr.addstr(y, 0, str(data[i]), curses.color_pair(12))
                 else:
                     stdscr.addstr(y, 0, str(data[i]), curses.color_pair(7))
